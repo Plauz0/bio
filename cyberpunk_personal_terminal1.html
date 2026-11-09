@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>АРТЁМ КРАЙНОВ // CYBERPUNK HUD</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Orbitron, Rajdhani, Share Tech Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            black: '#07070b',
+                            dark: '#0c0d14',
+                            card: '#11121d',
+                            cyan: '#00f3ff',
+                            yellow: '#fcee0a',
+                            magenta: '#ff0055',
+                            green: '#00ff66',
+                            border: '#1f2338'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                        mono: ['"Share Tech Mono"', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base Cyberpunk Styles & Custom Scrollbar */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #07070b;
+            color: #d1d5db;
+            font-family: 'Rajdhani', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Custom Neon Scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090a10;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00f3ff;
+            box-shadow: 0 0 10px #00f3ff;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fcee0a;
+            box-shadow: 0 0 12px #fcee0a;
+        }
+
+        /* Cyberpunk Clip Paths */
+        .cyber-clip-corner {
+            clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+        }
+        .cyber-clip-btn {
+            clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+        }
+        .cyber-clip-badge {
+            clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+        }
+        .cyber-clip-card {
+            clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% calc(100% - 24px), calc(100% - 24px) 100%, 0 100%);
+        }
+
+        /* Scanlines Overlay */
+        .scanlines {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.45) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.03),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.03)
+            );
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
+        }
+
+        /* Grid Background Pattern */
+        .cyber-grid {
+            background-image: 
+                linear-gradient(to right, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Glitch Animation */
+        .glitch-text {
+            position: relative;
+            display: inline-block;
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+        .glitch-text::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff0055;
+            animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+        }
+        .glitch-text::after {
+            left: -2px;
+            text-shadow: 2px 0 #00f3ff;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(20% 0 70% 0); }
+            20% { clip-path: inset(60% 0 10% 0); }
+            40% { clip-path: inset(40% 0 50% 0); }
+            60% { clip-path: inset(80% 0 5% 0); }
+            80% { clip-path: inset(10% 0 85% 0); }
+            100% { clip-path: inset(30% 0 40% 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(15% 0 60% 0); }
+            25% { clip-path: inset(75% 0 15% 0); }
+            50% { clip-path: inset(30% 0 55% 0); }
+            75% { clip-path: inset(85% 0 5% 0); }
+            100% { clip-path: inset(5% 0 80% 0); }
+        }
+
+        /* Neon Glow Utility */
+        .neon-cyan-glow {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.7), 0 0 25px rgba(0, 243, 255, 0.4);
+        }
+        .neon-yellow-glow {
+            text-shadow: 0 0 10px rgba(252, 238, 10, 0.7), 0 0 25px rgba(252, 238, 10, 0.4);
+        }
+        .box-glow-cyan {
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.25), inset 0 0 15px rgba(0, 243, 255, 0.08);
+        }
+        .box-glow-magenta {
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.25), inset 0 0 15px rgba(255, 0, 85, 0.08);
+        }
+
+        /* Pulsing Beacon */
+        @keyframes cyber-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.9); }
+        }
+        .cyber-pulsing {
+            animation: cyber-pulse 2s infinite ease-in-out;
+        }
+
+        /* Terminal styling */
+        .terminal-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: #00ff66;
+        }
+
+        /* Highlight text styling */
+        .highlight {
+            color: #fcee0a;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(252, 238, 10, 0.6);
+        }
+    </style>
+</head>
+<body class="relative min-h-screen cyber-grid selection:bg-cyber-cyan selection:text-black">
+
+    <!-- Scanline CRT Ambient Layer -->
+    <div id="scanlineLayer" class="fixed inset-0 scanlines z-40 pointer-events-none opacity-70 transition-opacity duration-300"></div>
+
+    <!-- Ambient Glow Blobs in Background -->
+    <div class="fixed top-1/4 left-5 w-96 h-96 bg-cyber-cyan/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+    <div class="fixed bottom-1/4 right-5 w-96 h-96 bg-cyber-magenta/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+    <div class="fixed top-2/3 left-1/3 w-80 h-80 bg-cyber-yellow/5 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+
+    <!-- ======================================================== -->
+    <!-- TOP SYSTEM HUD BAR                                      -->
+    <!-- ======================================================== -->
+    <header class="sticky top-0 z-50 backdrop-blur-md bg-cyber-black/85 border-b border-cyber-cyan/30 px-4 py-2.5">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs font-mono tracking-wider">
+            <!-- Left: Identity & State -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 bg-cyber-card border border-cyber-cyan/40 px-3 py-1 cyber-clip-badge">
+                    <span class="w-2.5 h-2.5 rounded-full bg-cyber-green cyber-pulsing shadow-[0_0_8px_#00ff66]"></span>
+                    <span class="text-cyber-green font-bold">STATUS: ONLINE</span>
+                </div>
+                <div class="hidden sm:flex items-center gap-2 text-cyber-cyan/80">
+                    <i class="fa-solid fa-microchip text-cyber-yellow"></i>
+                    <span>SYS_VER: 4.8.2 // NC-NET</span>
+                </div>
+            </div>
+
+            <!-- Center: Live Clock & Simulated Ping -->
+            <div class="hidden md:flex items-center gap-6 text-gray-400">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-satellite-dish text-cyber-cyan"></i>
+                    <span>PING: <span id="pingValue" class="text-cyber-cyan font-bold">14</span>ms</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-regular fa-clock text-cyber-yellow"></i>
+                    <span id="hudClock" class="text-gray-200">2077.11.09 // 00:00:00</span>
+                </div>
+            </div>
+
+            <!-- Right: Interactive Controls (Sound & Scanlines) -->
+            <div class="flex items-center gap-2">
+                <!-- Scanline Toggle -->
+                <button id="toggleScanlinesBtn" class="px-2.5 py-1 text-[11px] bg-cyber-card border border-gray-700 hover:border-cyber-cyan text-gray-300 hover:text-cyber-cyan transition-all cyber-clip-btn flex items-center gap-1.5" title="Переключить CRT-эффект">
+                    <i class="fa-solid fa-tv"></i>
+                    <span>CRT: <span id="crtState">ON</span></span>
+                </button>
+                <!-- Audio Toggle -->
+                <button id="toggleAudioBtn" class="px-2.5 py-1 text-[11px] bg-cyber-card border border-cyber-yellow/40 hover:border-cyber-yellow text-cyber-yellow transition-all cyber-clip-btn flex items-center gap-1.5" title="Включить звуковые эффекты интерфейса">
+                    <i id="audioIcon" class="fa-solid fa-volume-xmark"></i>
+                    <span>AUDIO: <span id="audioState">OFF</span></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================== -->
+    <!-- SCREEN 1: HERO / BUSINESS CARD                          -->
+    <!-- ======================================================== -->
+    <main class="max-w-6xl mx-auto px-4 py-8 md:py-16 min-h-[calc(100vh-60px)] flex flex-col justify-center">
+        
+        <!-- Cyber Border Card Container -->
+        <div class="relative bg-cyber-card/90 border border-cyber-cyan/40 p-6 md:p-12 cyber-clip-corner box-glow-cyan backdrop-blur-sm">
+            
+            <!-- Corner Cybernetic Tech Decors -->
+            <div class="absolute -top-[1px] -left-[1px] w-6 h-6 border-t-2 border-l-2 border-cyber-yellow pointer-events-none"></div>
+            <div class="absolute -bottom-[1px] -right-[1px] w-6 h-6 border-b-2 border-r-2 border-cyber-yellow pointer-events-none"></div>
+            <div class="absolute top-2 right-4 text-[10px] font-mono text-cyber-cyan/50 tracking-widest hidden sm:block">
+                SEC_CLEARANCE: LVL_5 // DATA_BLOCK_A-1
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Left Column: Holo Avatar & Cyber Status -->
+                <div class="lg:col-span-4 flex flex-col items-center text-center">
+                    <!-- Avatar Frame -->
+                    <div class="relative w-48 h-48 sm:w-56 sm:h-56 p-2 border-2 border-dashed border-cyber-cyan/60 rounded-xl cyber-clip-card bg-cyber-dark/80 group">
+                        <!-- Scanning line inside avatar -->
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyber-cyan/20 to-transparent h-6 w-full animate-pulse pointer-events-none"></div>
+                        
+                        <!-- Main Avatar Picture (Replaceable Placeholder) -->
+                        <img 
+                            id="userAvatar"
+                            src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=600&auto=format&fit=crop&q=80" 
+                            alt="Артём Крайнов" 
+                            class="w-full h-full object-cover rounded-lg filter contrast-125 saturate-125 transition-transform duration-500 group-hover:scale-105"
+                            onerror="this.src='https://placehold.co/400x400/0c0d14/00f3ff?text=PLAUZ0'"
+                        >
+                        <!-- Holo Corner Badges -->
+                        <span class="absolute top-2 left-2 text-[9px] font-mono bg-cyber-black/90 text-cyber-yellow px-1 border border-cyber-yellow/40">ID: #077-ART</span>
+                        <span class="absolute bottom-2 right-2 text-[9px] font-mono bg-cyber-black/90 text-cyber-cyan px-1 border border-cyber-cyan/40">PLAUZ // TALANT</span>
+                    </div>
+
+                    <!-- Role Badges below Avatar -->
+                    <div class="mt-4 flex flex-wrap justify-center gap-2">
+                        <span class="text-xs font-mono px-2 py-0.5 bg-cyber-yellow/10 border border-cyber-yellow/40 text-cyber-yellow cyber-clip-badge">VIBECODER</span>
+                        <span class="text-xs font-mono px-2 py-0.5 bg-cyber-cyan/10 border border-cyber-cyan/40 text-cyber-cyan cyber-clip-badge">ESPORTS</span>
+                        <span class="text-xs font-mono px-2 py-0.5 bg-cyber-magenta/10 border border-cyber-magenta/40 text-cyber-magenta cyber-clip-badge">SYS_CONTROL</span>
+                        <span class="text-xs font-mono px-2 py-0.5 bg-cyber-green/10 border border-cyber-green/40 text-cyber-green cyber-clip-badge">AUTOMATION</span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Personal Info & Glitch Typography -->
+                <div class="lg:col-span-8 flex flex-col justify-center">
+                    
+                    <!-- Pre-title / Callsign -->
+                    <div class="flex items-center gap-2 font-mono text-xs sm:text-sm text-cyber-yellow mb-2 tracking-widest">
+                        <span class="inline-block w-2 h-2 bg-cyber-yellow animate-ping"></span>
+                        <span>CALLSIGN: PLAUZ // STARIY TALANT.</span>
+                    </div>
+
+                    <!-- Main Name with Glitch Effect -->
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-black font-orbitron uppercase text-white tracking-wider mb-3 leading-tight">
+                        <span class="glitch-text text-white drop-shadow-[0_0_15px_rgba(0,243,255,0.6)]" data-text="АРТЁМ КРАЙНОВ">АРТЁМ КРАЙНОВ</span>
+                    </h1>
+
+                    <!-- Subtitle / Bio Intro -->
+                    <div class="relative bg-cyber-dark/80 border-l-4 border-cyber-cyan p-4 my-4 font-mono text-sm sm:text-base text-gray-300 leading-relaxed">
+                        <div class="text-[10px] text-cyber-cyan/70 mb-1 tracking-widest uppercase">// BRIEF DOSSIER OVERVIEW:</div>
+                        <p>
+                            Вайбкодер и исследователь цифровых потоков. Осваиваю специальность 
+                            <span class="highlight">«Управление в технических системах»</span>, проектируя логику 
+                            автоматизации и контуры контроля. Вне рабочего терминала погружаюсь в виртуальные миры 
+                            и соревновательные игровые симуляции.
+                        </p>
+                    </div>
+
+                    <!-- Quick Cyberpunk Stats Row -->
+                    <div class="grid grid-cols-3 gap-2 sm:gap-4 my-3 font-mono text-center">
+                        <div class="bg-cyber-dark/60 border border-gray-800 p-2 cyber-clip-btn">
+                            <div class="text-[11px] text-gray-400">EXP_LEVEL</div>
+                            <div class="text-sm sm:text-base font-bold text-cyber-cyan">LVL 19+ / DEV</div>
+                        </div>
+                        <div class="bg-cyber-dark/60 border border-gray-800 p-2 cyber-clip-btn">
+                            <div class="text-[11px] text-gray-400">STACK_CORE</div>
+                            <div class="text-sm sm:text-base font-bold text-cyber-yellow">PY / C# / WEB</div>
+                        </div>
+                        <div class="bg-cyber-dark/60 border border-gray-800 p-2 cyber-clip-btn">
+                            <div class="text-[11px] text-gray-400">LOCATION</div>
+                            <div class="text-sm sm:text-base font-bold text-cyber-magenta">EARTH // CYBER</div>
+                        </div>
+                    </div>
+
+                    <!-- Social Links Grid -->
+                    <div class="mt-6">
+                        <div class="text-xs font-mono text-gray-400 mb-3 tracking-widest flex items-center gap-2">
+                            <i class="fa-solid fa-link text-cyber-cyan"></i>
+                            <span>COMMUNICATION CHANNELS // СВЯЗЬ:</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                            <!-- Telegram Primary -->
+                            <a href="https://t.me/stapblu" target="_blank" rel="noopener noreferrer" 
+                               class="cyber-btn group flex items-center gap-2.5 p-2.5 bg-cyber-dark border border-cyber-cyan/40 hover:border-cyber-cyan hover:bg-cyber-cyan/10 transition-all duration-300 cyber-clip-btn">
+                                <i class="fa-brands fa-telegram text-xl text-cyber-cyan group-hover:scale-110 transition-transform"></i>
+                                <div class="overflow-hidden">
+                                    <div class="text-[10px] text-gray-400 font-mono">TELEGRAM</div>
+                                    <div class="text-xs font-bold text-white group-hover:text-cyber-cyan truncate">@stapblu</div>
+                                </div>
+                            </a>
+
+                            <!-- Telegram Secondary / Alt -->
+                            <a href="https://t.me/scaletaaa" target="_blank" rel="noopener noreferrer" 
+                               class="cyber-btn group flex items-center gap-2.5 p-2.5 bg-cyber-dark border border-cyber-cyan/40 hover:border-cyber-cyan hover:bg-cyber-cyan/10 transition-all duration-300 cyber-clip-btn">
+                                <i class="fa-solid fa-paper-plane text-xl text-cyber-cyan group-hover:scale-110 transition-transform"></i>
+                                <div class="overflow-hidden">
+                                    <div class="text-[10px] text-gray-400 font-mono">TG CHANNEL</div>
+                                    <div class="text-xs font-bold text-white group-hover:text-cyber-cyan truncate">scaletaaa</div>
+                                </div>
+                            </a>
+
+                            <!-- GitHub -->
+                            <a href="https://github.com/Plauz0" target="_blank" rel="noopener noreferrer" 
+                               class="cyber-btn group flex items-center gap-2.5 p-2.5 bg-cyber-dark border border-gray-700 hover:border-cyber-yellow hover:bg-cyber-yellow/10 transition-all duration-300 cyber-clip-btn">
+                                <i class="fa-brands fa-github text-xl text-white group-hover:text-cyber-yellow group-hover:scale-110 transition-transform"></i>
+                                <div class="overflow-hidden">
+                                    <div class="text-[10px] text-gray-400 font-mono">GITHUB</div>
+                                    <div class="text-xs font-bold text-white group-hover:text-cyber-yellow truncate">Plauz0</div>
+                                </div>
+                            </a>
+
+                            <!-- Steam -->
+                            <a href="https://steamcommunity.com/id/plauz0/" target="_blank" rel="noopener noreferrer" 
+                               class="cyber-btn group flex items-center gap-2.5 p-2.5 bg-cyber-dark border border-gray-700 hover:border-cyber-cyan hover:bg-cyber-cyan/10 transition-all duration-300 cyber-clip-btn">
+                                <i class="fa-brands fa-steam text-xl text-cyber-cyan group-hover:scale-110 transition-transform"></i>
+                                <div class="overflow-hidden">
+                                    <div class="text-[10px] text-gray-400 font-mono">STEAM</div>
+                                    <div class="text-xs font-bold text-white group-hover:text-cyber-cyan truncate">Stariy talant.</div>
+                                </div>
+                            </a>
+
+                            <!-- VK -->
+                            <a href="https://vk.ru/plauz" target="_blank" rel="noopener noreferrer" 
+                               class="cyber-btn group flex items-center gap-2.5 p-2.5 bg-cyber-dark border border-gray-700 hover:border-blue-400 hover:bg-blue-500/10 transition-all duration-300 cyber-clip-btn">
+                                <i class="fa-brands fa-vk text-xl text-blue-400 group-hover:scale-110 transition-transform"></i>
+                                <div class="overflow-hidden">
+                                    <div class="text-[10px] text-gray-400 font-mono">VKONTAKTE</div>
+                                    <div class="text-xs font-bold text-white group-hover:text-blue-400 truncate">Артём Крайнов</div>
+                                </div>
+                            </a>
+
+                            <!-- Twitch / Streaming -->
+                            <a href="https://www.twitch.tv/scaleta__" target="_blank" rel="noopener noreferrer" 
+                               class="cyber-btn group flex items-center gap-2.5 p-2.5 bg-cyber-dark border border-gray-700 hover:border-cyber-magenta hover:bg-cyber-magenta/10 transition-all duration-300 cyber-clip-btn">
+                                <i class="fa-brands fa-twitch text-xl text-cyber-magenta group-hover:scale-110 transition-transform"></i>
+                                <div class="overflow-hidden">
+                                    <div class="text-[10px] text-gray-400 font-mono">TWITCH / MEDIA</div>
+                                    <div class="text-xs font-bold text-white group-hover:text-cyber-magenta truncate">scaleta__</div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Bottom Action: Scroll down to Page 2 (Archive) -->
+            <div class="mt-10 pt-6 border-t border-gray-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-xs font-mono text-gray-500 flex items-center gap-2">
+                    <span class="inline-block w-2 h-2 bg-cyber-cyan"></span>
+                    <span>READY FOR DATA EXTRACTION // SCROLL OR CLICK TRIGGER</span>
+                </div>
+
+                <a href="#archiveSection" class="scroll-trigger-btn group inline-flex items-center gap-3 px-6 py-3 bg-cyber-yellow hover:bg-cyber-cyan text-black font-orbitron font-bold text-sm tracking-wider uppercase transition-all duration-300 cyber-clip-btn shadow-[0_0_15px_rgba(252,238,10,0.4)] hover:shadow-[0_0_20px_rgba(0,243,255,0.7)]">
+                    <span>[ ACCESS ARCHIVE // ДАЛЕЕ ]</span>
+                    <i class="fa-solid fa-angles-down group-hover:translate-y-1 transition-transform"></i>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ======================================================== -->
+    <!-- SCREEN 2: DATA ARCHIVE // ФОТОГАЛЕРЕЯ И ДОСЬЕ           -->
+    <!-- ======================================================== -->
+    <section id="archiveSection" class="relative max-w-6xl mx-auto px-4 py-16 border-t border-cyber-cyan/20">
+        
+        <!-- Header of Second Screen -->
+        <div class="mb-12">
+            <div class="flex items-center gap-3 text-cyber-cyan font-mono text-xs tracking-widest mb-1">
+                <i class="fa-solid fa-database"></i>
+                <span>SUBSYSTEM: DEEP_MEMORY_BANK // SECTOR 02</span>
+            </div>
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <h2 class="text-3xl md:text-5xl font-black font-orbitron text-white tracking-wider">
+                    DATA ARCHIVE <span class="text-cyber-yellow">//</span> <span class="text-cyber-cyan">ФОТО И ДОСЬЕ</span>
+                </h2>
+                <div class="text-xs font-mono text-gray-400 bg-cyber-dark px-3 py-1.5 border border-gray-800 cyber-clip-badge">
+                    ENCRYPTION: AES-CYBER-256 // STATUS: DECRYPTED
+                </div>
+            </div>
+            <div class="w-full h-1 bg-gradient-to-r from-cyber-cyan via-cyber-yellow to-cyber-magenta mt-4 opacity-75"></div>
+        </div>
+
+        <!-- 1. PHOTO GALLERY SECTION -->
+        <div class="mb-16">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold font-orbitron text-cyber-yellow flex items-center gap-2">
+                    <i class="fa-solid fa-camera-retro"></i>
+                    <span>VISUAL RECORDS // ФОТОГАЛЕРЕЯ</span>
+                </h3>
+                <span class="text-xs font-mono text-gray-400 hidden sm:inline">КЛИК ДЛЯ ИНСПЕКЦИИ И ЗУМА</span>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- Photo Card 1 -->
+                <div class="gallery-item group relative bg-cyber-card border border-cyber-cyan/30 hover:border-cyber-cyan p-2.5 cyber-clip-card transition-all duration-300 hover:-translate-y-1 cursor-pointer box-glow-cyan"
+                     data-full="https://sun9-6.vkuserphoto.ru/s/v1/ig2/N9s3hBpcaZxOWo4agS08vQRdQNnjWzZ--_P89cn0DxJTpYwuBM-sWiF0r0iJ9HZLz8kJ3u6BeGilkwx0wCwq0QEd.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1707x0"
+                     data-title="ESPORT // ESnow League: Dota 2"
+                     data-desc="ESnow League: Dota 2, заняли 3-е место ( https://vk.ru/wall-162788416_1616 )">
+                    <div class="relative h-56 overflow-hidden rounded">
+                        <img src="https://sun9-6.vkuserphoto.ru/s/v1/ig2/N9s3hBpcaZxOWo4agS08vQRdQNnjWzZ--_P89cn0DxJTpYwuBM-sWiF0r0iJ9HZLz8kJ3u6BeGilkwx0wCwq0QEd.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1707x0" 
+                             alt="Рабочее место" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 filter contrast-110"
+                             onerror="this.src='https://placehold.co/600x400/0c0d14/00f3ff?text=IMG_LOG_01'">
+                        <div class="absolute inset-0 bg-cyber-cyan/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="p-3 bg-cyber-black/80 rounded-full border border-cyber-cyan text-cyber-cyan"><i class="fa-solid fa-expand"></i></span>
+                        </div>
+                        <span class="absolute top-2 left-2 text-[10px] font-mono bg-cyber-black/90 px-1.5 py-0.5 text-cyber-cyan border border-cyber-cyan/40">IMG_LOG_01</span>
+                    </div>
+                    <div class="p-3">
+                        <div class="text-sm font-bold font-orbitron text-white group-hover:text-cyber-cyan transition-colors">ESPORT</div>
+                        <p class="text-xs font-mono text-gray-400 mt-1 truncate">ESnow League: Dota 2</p>
+                    </div>
+                </div>
+
+                <!-- Photo Card 2 -->
+                <div class="gallery-item group relative bg-cyber-card border border-cyber-cyan/30 hover:border-cyber-yellow p-2.5 cyber-clip-card transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+                     data-full="https://sun9-68.vkuserphoto.ru/s/v1/ig2/cddDAQAJTSRyFxKnkI_7RWBSjWOTWhV7B0zOe2C3zxgspoavXbmoj0qoUhW6ti0JfqCuydp-79mUlsTuxFaJSMQk.jpg?quality=95&as=32x23,48x35,72x53,108x79,160x117,240x175,360x263,480x351,540x395,640x468,720x526,1063x777&from=bu&u=Lo0DhTQW99ynR-44VL67IIR4t0Z01DqKzh8BEaR_vn4&cs=1063x0"
+                     data-title="ESPORT // ГРАМОТА"
+                     data-desc="ЛТак сказать, призовые">
+                    <div class="relative h-56 overflow-hidden rounded">
+                        <img src="https://sun9-68.vkuserphoto.ru/s/v1/ig2/cddDAQAJTSRyFxKnkI_7RWBSjWOTWhV7B0zOe2C3zxgspoavXbmoj0qoUhW6ti0JfqCuydp-79mUlsTuxFaJSMQk.jpg?quality=95&as=32x23,48x35,72x53,108x79,160x117,240x175,360x263,480x351,540x395,640x468,720x526,1063x777&from=bu&u=Lo0DhTQW99ynR-44VL67IIR4t0Z01DqKzh8BEaR_vn4&cs=1063x0" 
+                             alt="Кибербезопасность" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 filter contrast-110"
+                             onerror="this.src='https://placehold.co/600x400/0c0d14/fcee0a?text=IMG_LOG_02'">
+                        <div class="absolute inset-0 bg-cyber-yellow/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="p-3 bg-cyber-black/80 rounded-full border border-cyber-yellow text-cyber-yellow"><i class="fa-solid fa-expand"></i></span>
+                        </div>
+                        <span class="absolute top-2 left-2 text-[10px] font-mono bg-cyber-black/90 px-1.5 py-0.5 text-cyber-yellow border border-cyber-yellow/40">IMG_LOG_02</span>
+                    </div>
+                    <div class="p-3">
+                        <div class="text-sm font-bold font-orbitron text-white group-hover:text-cyber-yellow transition-colors">ESnow League: Dota 2</div>
+                        <p class="text-xs font-mono text-gray-400 mt-1 truncate">Участвовал в составе команды "Mibombo"</p>
+                    </div>
+                </div>
+
+                <!-- Photo Card 3 
+                <div class="gallery-item group relative bg-cyber-card border border-cyber-cyan/30 hover:border-cyber-magenta p-2.5 cyber-clip-card transition-all duration-300 hover:-translate-y-1 cursor-pointer box-glow-magenta"
+                     data-full="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&auto=format&fit=crop&q=80"
+                     data-title="SYSTEM ARCHITECTURE & CIRCUITS"
+                     data-desc="Проектирование логических цепей, высоконагруженных алгоритмов и пайплайнов обработки.">
+                    <div class="relative h-56 overflow-hidden rounded">
+                        <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80" 
+                             alt="Микросхемы" 
+                             class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 filter contrast-110"
+                             onerror="this.src='https://placehold.co/600x400/0c0d14/ff0055?text=IMG_LOG_03'">
+                        <div class="absolute inset-0 bg-cyber-magenta/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span class="p-3 bg-cyber-black/80 rounded-full border border-cyber-magenta text-cyber-magenta"><i class="fa-solid fa-expand"></i></span>
+                        </div>
+                        <span class="absolute top-2 left-2 text-[10px] font-mono bg-cyber-black/90 px-1.5 py-0.5 text-cyber-magenta border border-cyber-magenta/40">IMG_LOG_03</span>
+                    </div>
+                    <div class="p-3">
+                        <div class="text-sm font-bold font-orbitron text-white group-hover:text-cyber-magenta transition-colors">SYSTEM ARCHITECTURE</div>
+                        <p class="text-xs font-mono text-gray-400 mt-1 truncate">Пайплайны распределенных вычислений</p>
+                    </div>
+                </div>-->
+
+            </div>
+            
+            <p class="text-[11px] font-mono text-gray-500 mt-3 text-center sm:text-left">
+                * Примечание: Для замены изображений используйте атрибуты <code class="text-cyber-cyan">src</code> и <code class="text-cyber-cyan">data-full</code> в коде карточек.
+            </p>
+        </div>
+
+        <!-- 2. CYBERNETIC SPECS & SKILLS MONITOR -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 items-start">
+            
+            <!-- Left: Hardware / Skill Level Sliders -->
+            <div class="lg:col-span-7 bg-cyber-card/90 border border-cyber-cyan/30 p-6 cyber-clip-corner">
+                <div class="flex items-center justify-between mb-6 pb-2 border-b border-gray-800">
+                    <h3 class="text-lg font-bold font-orbitron text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-simple text-cyber-cyan"></i>
+                        <span>HARDWARE & TECH CAPABILITIES // НАВЫКИ</span>
+                    </h3>
+                    <span class="text-xs font-mono text-cyber-green">ONLINE // 100%</span>
+                </div>
+
+                <!-- Skill Bars -->
+                <div class="space-y-4 font-mono text-xs">
+                    
+                    <!-- Skill 1: ESPORTS -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-white font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-gamepad text-cyber-cyan"></i>
+                                ESPORTS [ COMPETITIVE GAMING / REFLEX / TACTICS ]
+                            </span>
+                            <span class="text-cyber-cyan font-bold">100%</span>
+                        </div>
+                        <div class="w-full h-3 bg-cyber-dark border border-gray-800 rounded p-[1px]">
+                            <div class="skill-bar h-full bg-gradient-to-r from-blue-500 via-cyber-cyan to-white shadow-[0_0_10px_#00f3ff]" style="width: 100%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill 2: AHK / SCRIPTING -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-white font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-keyboard text-cyber-magenta"></i>
+                                AHK / SCRIPTING [ MACROS & OS AUTOMATION ]
+                            </span>
+                            <span class="text-cyber-magenta font-bold">70%</span>
+                        </div>
+                        <div class="w-full h-3 bg-cyber-dark border border-gray-800 rounded p-[1px]">
+                            <div class="skill-bar h-full bg-gradient-to-r from-purple-600 to-cyber-magenta shadow-[0_0_8px_#ff0055]" style="width: 70%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill 3: WEB TECHNOLOGIES -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-white font-bold flex items-center gap-2">
+                                <i class="fa-brands fa-js text-cyber-green"></i>
+                                WEB TECHNOLOGIES [ MODERN FULL-STACK / TAILWIND / REST ]
+                            </span>
+                            <span class="text-cyber-green font-bold">67%</span>
+                        </div>
+                        <div class="w-full h-3 bg-cyber-dark border border-gray-800 rounded p-[1px]">
+                            <div class="skill-bar h-full bg-gradient-to-r from-emerald-600 to-cyber-green shadow-[0_0_8px_#00ff66]" style="width: 67%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill 4: PYTHON -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-white font-bold flex items-center gap-2">
+                                <i class="fa-brands fa-python text-cyber-yellow"></i>
+                                PYTHON [ AUTOMATION / BOT FRAMEWORKS / AI API ]
+                            </span>
+                            <span class="text-cyber-yellow font-bold">40%</span>
+                        </div>
+                        <div class="w-full h-3 bg-cyber-dark border border-gray-800 rounded p-[1px]">
+                            <div class="skill-bar h-full bg-gradient-to-r from-amber-600 to-cyber-yellow shadow-[0_0_8px_#fcee0a]" style="width: 40%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill 5: C# & .NET CORE -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-white font-bold flex items-center gap-2">
+                                <i class="fa-solid fa-code text-cyber-cyan"></i>
+                                C# & .NET CORE [ DESKTOP APPS / LOGIC / BACKEND ]
+                            </span>
+                            <span class="text-cyber-cyan font-bold">30%</span>
+                        </div>
+                        <div class="w-full h-3 bg-cyber-dark border border-gray-800 rounded p-[1px]">
+                            <div class="skill-bar h-full bg-gradient-to-r from-sky-700 to-cyber-cyan shadow-[0_0_8px_#00f3ff]" style="width: 30%"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Bottom Telemetry Chips -->
+                <div class="mt-6 pt-4 border-t border-gray-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center font-mono text-[11px]">
+                    <div class="p-2 bg-cyber-dark border border-gray-800">
+                        <div class="text-gray-500">NEURAL SYNC</div>
+                        <div class="text-cyber-cyan font-bold">99.8%</div>
+                    </div>
+                    <div class="p-2 bg-cyber-dark border border-gray-800">
+                        <div class="text-gray-500">CLOCK SPEED</div>
+                        <div class="text-cyber-yellow font-bold">4.90 GHz</div>
+                    </div>
+                    <div class="p-2 bg-cyber-dark border border-gray-800">
+                        <div class="text-gray-500">TEMP</div>
+                        <div class="text-cyber-green font-bold">38°C OPT</div>
+                    </div>
+                    <div class="p-2 bg-cyber-dark border border-gray-800">
+                        <div class="text-gray-500">MEMORY ALLOC</div>
+                        <div class="text-cyber-magenta font-bold">64 GB ECC</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right: Cyborg Specs / Dossier Notes -->
+            <div class="lg:col-span-5 bg-cyber-card/90 border border-cyber-yellow/40 p-6 cyber-clip-corner relative">
+                <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-800">
+                    <i class="fa-solid fa-address-card text-cyber-yellow"></i>
+                    <h3 class="text-lg font-bold font-orbitron text-white">SUBJECT DOSSIER // АНКЕТА</h3>
+                </div>
+
+                <div class="space-y-3 font-mono text-xs leading-relaxed text-gray-300">
+                    <div class="flex justify-between border-b border-gray-800/60 pb-1.5">
+                        <span class="text-gray-500">ПОЛНОЕ ИМЯ:</span>
+                        <span class="text-white font-bold">Артём Крайнов</span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-800/60 pb-1.5">
+                        <span class="text-gray-500">CALLSIGN / NICK:</span>
+                        <span class="text-cyber-cyan font-bold">PLAUZ // Stariy talant.</span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-800/60 pb-1.5">
+                        <span class="text-gray-500">СПЕЦИАЛИЗАЦИЯ:</span>
+                        <span class="text-cyber-yellow">eSport / Vibecoding / Управление в тех. системах</span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-800/60 pb-1.5">
+                        <span class="text-gray-500">ОСНОВНЫЕ ИНТЕРЕСЫ:</span>
+                        <span class="text-gray-200">Нейросети, DevTools, Gaming, UI/UX</span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-800/60 pb-1.5">
+                        <span class="text-gray-500">СТАТУС ДОСТУПА:</span>
+                        <span class="text-cyber-green font-bold">READY TO COLLABORATE</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">ОСНОВНОЙ КАНАЛ:</span>
+                        <a href="https://t.me/scaletaaa" target="_blank" class="text-cyber-cyan font-bold hover:underline">t.me/scaletaaa</a>
+                    </div>
+                </div>
+
+                <!-- Cyber Quote Box -->
+                <div class="mt-6 bg-cyber-dark/80 p-3.5 border-l-2 border-cyber-yellow font-mono text-xs text-gray-400">
+                    <span class="text-cyber-yellow font-bold">"</span> Любая сложная система становится послушной, 
+                    если понимать логику её внутренних процессов. Код — это инструмент преобразования хаоса в результат. <span class="text-cyber-yellow font-bold">"</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 3. INTERACTIVE CYBER TERMINAL -->
+        <div class="bg-cyber-dark border border-cyber-green/40 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(0,255,102,0.1)]">
+            <!-- Terminal Title Bar -->
+            <div class="bg-black/90 px-4 py-2 border-b border-cyber-green/30 flex items-center justify-between font-mono text-xs">
+                <div class="flex items-center gap-2 text-cyber-green">
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>PLAUZ_NET_CONSOLE // BASH_V5.2</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded-full bg-red-600/80 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                </div>
+            </div>
+
+            <!-- Terminal Output Area -->
+            <div id="terminalBody" class="p-4 h-64 overflow-y-auto font-mono text-xs sm:text-sm text-cyber-green/90 space-y-1 terminal-scroll bg-[#050608]">
+                <div class="text-gray-500">// Welcome to Night City Netrunner Shell v4.0.9</div>
+                <div class="text-gray-500">// Type <span class="text-cyber-yellow font-bold">'help'</span> for a list of available sub-routines.</div>
+                <div class="text-cyber-cyan mt-2">guest@nightcity:~$ welcome</div>
+                <div class="text-gray-300">Добро пожаловать в персональный архив Артёма Крайнова [PLAUZ // Stariy talant.]. Терминал готов к выполнению инструкций.</div>
+            </div>
+
+            <!-- Terminal Input Line -->
+            <form id="terminalForm" class="flex items-center gap-2 bg-black/95 px-4 py-2.5 border-t border-cyber-green/30">
+                <span class="text-cyber-yellow font-mono text-xs sm:text-sm font-bold">guest@nightcity:~$</span>
+                <input 
+                    type="text" 
+                    id="terminalInput" 
+                    autocomplete="off" 
+                    spellcheck="false"
+                    placeholder="help, skills, contacts, bio, clear..." 
+                    class="w-full bg-transparent border-none text-cyber-green focus:outline-none font-mono text-xs sm:text-sm placeholder-gray-600"
+                >
+                <button type="submit" class="text-xs font-mono px-3 py-1 bg-cyber-green/10 border border-cyber-green/50 text-cyber-green hover:bg-cyber-green hover:text-black transition-all">
+                    EXEC
+                </button>
+            </form>
+        </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- LIGHTBOX MODAL FOR IMAGES                                -->
+    <!-- ======================================================== -->
+    <div id="lightboxModal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="relative max-w-4xl w-full bg-cyber-card border-2 border-cyber-cyan cyber-clip-corner p-4 box-glow-cyan">
+            
+            <!-- Close Button -->
+            <button id="closeLightboxBtn" class="absolute top-3 right-3 text-cyber-cyan hover:text-cyber-yellow text-xl p-2 z-10 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Lightbox Image Container -->
+            <div class="max-h-[70vh] overflow-hidden flex items-center justify-center bg-black/60 rounded">
+                <img id="lightboxImg" src="" alt="Full View" class="max-h-[65vh] w-auto object-contain rounded">
+            </div>
+
+            <!-- Meta Information -->
+            <div class="mt-4 pt-3 border-t border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-mono">
+                <div>
+                    <h4 id="lightboxTitle" class="text-base font-bold font-orbitron text-white">IMAGE_RECORD</h4>
+                    <p id="lightboxDesc" class="text-xs text-gray-400 mt-0.5">Record description</p>
+                </div>
+                <div class="text-[10px] text-cyber-cyan bg-cyber-dark px-3 py-1 border border-cyber-cyan/30 self-start sm:self-auto cyber-clip-badge">
+                    CHECKSUM: OK // 2077
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- FOOTER                                                   -->
+    <!-- ======================================================== -->
+    <footer class="border-t border-cyber-cyan/30 bg-cyber-black py-8 px-4 font-mono text-xs text-gray-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+            <div>
+                <span class="text-cyber-cyan font-bold">АРТЁМ КРАЙНОВ</span> // PLAUZ [STARIY TALANT] © 2077. NIGHT CITY ARCHIVES.
+            </div>
+            <div class="flex flex-wrap justify-center sm:justify-end items-center gap-3 text-gray-400">
+                <a href="https://t.me/stapblu" target="_blank" class="hover:text-cyber-cyan transition-colors">Telegram</a>
+                <span class="text-gray-700">/</span>
+                <a href="https://t.me/scaletaaa" target="_blank" class="hover:text-cyber-cyan transition-colors">Канал</a>
+                <span class="text-gray-700">/</span>
+                <a href="https://www.twitch.tv/scaleta__" target="_blank" class="hover:text-cyber-magenta transition-colors">Twitch</a>
+                <span class="text-gray-700">/</span>
+                <a href="https://vk.ru/plauz" target="_blank" class="hover:text-blue-400 transition-colors">VK</a>
+                <span class="text-gray-700">/</span>
+                <a href="https://github.com/plauz0" target="_blank" class="hover:text-cyber-yellow transition-colors">GitHub</a>
+                <span class="text-gray-700">/</span>
+                <a href="#top" class="hover:text-cyber-green transition-colors">[ TOP ^ ]</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======================================================== -->
+    <!-- JAVASCRIPT LOGIC & WEB AUDIO ENGINE                      -->
+    <!-- ======================================================== -->
+    <script>
+        // ----------------------------------------------------
+        // 1. WEB AUDIO API SYNTHESIZER (Sci-Fi Sound FX)
+        // ----------------------------------------------------
+        let audioCtx = null;
+        let isAudioEnabled = false;
+        let ambientOsc = null;
+        let ambientGain = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Tactical UI Click Beep
+        function playSciFiClick() {
+            if (!isAudioEnabled) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(220, audioCtx.currentTime + 0.08);
+
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // High frequency cyber blip on hover
+        function playSciFiHover() {
+            if (!isAudioEnabled) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1800, audioCtx.currentTime + 0.04);
+
+                gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        // Terminal Mechanical Tick
+        function playTerminalTick() {
+            if (!isAudioEnabled) return;
+            initAudio();
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.03);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.03);
+            } catch (e) {}
+        }
+
+        // Ambient Cyber Drone Sound
+        function startAmbientDrone() {
+            if (!audioCtx) initAudio();
+            try {
+                ambientOsc = audioCtx.createOscillator();
+                ambientGain = audioCtx.createGain();
+                
+                ambientOsc.type = 'triangle';
+                ambientOsc.frequency.setValueAtTime(65.41, audioCtx.currentTime); // Low C drone
+
+                ambientGain.gain.setValueAtTime(0.015, audioCtx.currentTime);
+
+                ambientOsc.connect(ambientGain);
+                ambientGain.connect(audioCtx.destination);
+
+                ambientOsc.start();
+            } catch (e) {}
+        }
+
+        function stopAmbientDrone() {
+            if (ambientOsc) {
+                try {
+                    ambientOsc.stop();
+                    ambientOsc.disconnect();
+                    ambientOsc = null;
+                } catch(e) {}
+            }
+        }
+
+        // Sound Toggle Button Handler
+        const toggleAudioBtn = document.getElementById('toggleAudioBtn');
+        const audioState = document.getElementById('audioState');
+        const audioIcon = document.getElementById('audioIcon');
+
+        toggleAudioBtn.addEventListener('click', () => {
+            initAudio();
+            isAudioEnabled = !isAudioEnabled;
+            if (isAudioEnabled) {
+                audioState.textContent = 'ON';
+                audioIcon.className = 'fa-solid fa-volume-high';
+                toggleAudioBtn.classList.remove('border-cyber-yellow/40', 'text-cyber-yellow');
+                toggleAudioBtn.classList.add('border-cyber-cyan', 'text-cyber-cyan', 'shadow-[0_0_10px_#00f3ff]');
+                startAmbientDrone();
+                playSciFiClick();
+            } else {
+                audioState.textContent = 'OFF';
+                audioIcon.className = 'fa-solid fa-volume-xmark';
+                toggleAudioBtn.classList.remove('border-cyber-cyan', 'text-cyber-cyan', 'shadow-[0_0_10px_#00f3ff]');
+                toggleAudioBtn.classList.add('border-cyber-yellow/40', 'text-cyber-yellow');
+                stopAmbientDrone();
+            }
+        });
+
+        // Attach sounds to all buttons and links
+        document.querySelectorAll('a, button, .gallery-item').forEach(el => {
+            el.addEventListener('mouseenter', () => playSciFiHover());
+            el.addEventListener('click', () => playSciFiClick());
+        });
+
+        // ----------------------------------------------------
+        // 2. SCANLINE TOGGLE
+        // ----------------------------------------------------
+        const toggleScanlinesBtn = document.getElementById('toggleScanlinesBtn');
+        const scanlineLayer = document.getElementById('scanlineLayer');
+        const crtState = document.getElementById('crtState');
+        let scanlinesOn = true;
+
+        toggleScanlinesBtn.addEventListener('click', () => {
+            scanlinesOn = !scanlinesOn;
+            scanlineLayer.style.opacity = scanlinesOn ? '0.7' : '0';
+            crtState.textContent = scanlinesOn ? 'ON' : 'OFF';
+            playSciFiClick();
+        });
+
+        // ----------------------------------------------------
+        // 3. REALTIME HUD CLOCK & DYNAMIC PING
+        // ----------------------------------------------------
+        function updateHudClock() {
+            const now = new Date();
+            const year = 2077; // Stylized Cyberpunk 2077 Year
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+
+            document.getElementById('hudClock').textContent = 
+                `${year}.${month}.${day} // ${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateHudClock, 1000);
+        updateHudClock();
+
+        // Realistic Ping Fluctuations
+        const pingEl = document.getElementById('pingValue');
+        setInterval(() => {
+            const basePing = 14;
+            const variance = Math.floor(Math.random() * 5) - 2;
+            pingEl.textContent = Math.max(9, basePing + variance);
+        }, 3500);
+
+        // ----------------------------------------------------
+        // 4. LIGHTBOX MODAL FUNCTIONALITY
+        // ----------------------------------------------------
+        const lightboxModal = document.getElementById('lightboxModal');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxTitle = document.getElementById('lightboxTitle');
+        const lightboxDesc = document.getElementById('lightboxDesc');
+        const closeLightboxBtn = document.getElementById('closeLightboxBtn');
+
+        document.querySelectorAll('.gallery-item').forEach(card => {
+            card.addEventListener('click', () => {
+                const fullUrl = card.getAttribute('data-full');
+                const title = card.getAttribute('data-title');
+                const desc = card.getAttribute('data-desc');
+
+                lightboxImg.src = fullUrl;
+                lightboxTitle.textContent = title;
+                lightboxDesc.textContent = desc;
+                lightboxModal.classList.remove('hidden');
+            });
+        });
+
+        function closeLightbox() {
+            lightboxModal.classList.add('hidden');
+            lightboxImg.src = '';
+            playSciFiClick();
+        }
+
+        closeLightboxBtn.addEventListener('click', closeLightbox);
+        lightboxModal.addEventListener('click', (e) => {
+            if (e.target === lightboxModal) closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !lightboxModal.classList.contains('hidden')) {
+                closeLightbox();
+            }
+        });
+
+        // ----------------------------------------------------
+        // 5. INTERACTIVE CYBER TERMINAL
+        // ----------------------------------------------------
+        const terminalBody = document.getElementById('terminalBody');
+        const terminalForm = document.getElementById('terminalForm');
+        const terminalInput = document.getElementById('terminalInput');
+
+        const COMMANDS = {
+            help: () => `
+                <div class="text-cyber-yellow">ДОСТУПНЫЕ КОМАНДЫ:</div>
+                <div class="pl-2">
+                    <div><span class="text-cyber-cyan font-bold">help</span> - Вывести список доступных директив</div>
+                    <div><span class="text-cyber-cyan font-bold">bio</span> - Краткое досье на Артёма Крайнова</div>
+                    <div><span class="text-cyber-cyan font-bold">skills</span> - Список освоенных языков и технологий</div>
+                    <div><span class="text-cyber-cyan font-bold">contacts</span> - Ссылки для прямого контакта</div>
+                    <div><span class="text-cyber-cyan font-bold">stats</span> - Аппаратные метрики ядра</div>
+                    <div><span class="text-cyber-cyan font-bold">matrix</span> - Активировать поток нейро-данных</div>
+                    <div><span class="text-cyber-cyan font-bold">clear</span> - Очистить экран консоли</div>
+                </div>`,
+            bio: () => `
+                <div class="text-gray-300">
+                    <span class="text-cyber-cyan font-bold">АРТЁМ КРАЙНОВ [PLAUZ // Stariy talant.]</span><br>
+                    Вайбкодер и исследователь цифровых потоков. Осваиваю специальность <span class="text-cyber-yellow">«Управление в технических системах»</span>.<br>
+                    Проектирую логику автоматизации и контуры контроля. В свободное время погружаюсь в киберспорт (eSports) и соревновательные виртуальные симуляции.
+                </div>`,
+            skills: () => `
+                <div class="text-gray-300">
+                    - <span class="text-cyber-cyan font-bold">ESPORTS:</span> 100% [Соревновательный гейминг / Рефлексы / Тактика]<br>
+                    - <span class="text-cyber-magenta font-bold">AHK / SCRIPTING:</span> 70% [Макросы и системная автоматизация]<br>
+                    - <span class="text-cyber-green font-bold">WEB TECHNOLOGIES:</span> 67% [Modern Full-Stack, Tailwind, REST API]<br>
+                    - <span class="text-cyber-yellow font-bold">PYTHON:</span> 40% [Скрипты, автоматизация, боты, AI API]<br>
+                    - <span class="text-cyber-cyan font-bold">C# & .NET:</span> 30% [Десктопные утилиты, системная логика]
+                </div>`,
+            contacts: () => `
+                <div class="text-gray-300">
+                    Telegram Личный: <a href="https://t.me/stapblu" target="_blank" class="text-cyber-cyan underline">@stapblu</a><br>
+                    Telegram Канал: <a href="https://t.me/scaletaaa" target="_blank" class="text-cyber-cyan underline">@scaletaaa</a><br>
+                    Twitch: <a href="https://www.twitch.tv/scaleta__" target="_blank" class="text-cyber-magenta underline">twitch.tv/scaleta__</a><br>
+                    VKontakte: <a href="https://vk.ru/plauz" target="_blank" class="text-blue-400 underline">vk.ru/plauz</a><br>
+                    GitHub: <a href="https://github.com/plauz0" target="_blank" class="text-cyber-yellow underline">github.com/plauz0</a><br>
+                    Steam: <a href="https://steamcommunity.com" target="_blank" class="text-cyber-cyan underline">PLAUZ0</a>
+                </div>`,
+            stats: () => `
+                <div class="text-cyber-green">
+                    STATUS: ALL SYSTEMS NOMINAL<br>
+                    CPU CORE: 4.90 GHz OVERCLOCK<br>
+                    RAM ALLOCATED: 64 GB // ERROR BUS: 0 ERRORS<br>
+                    FIREWALL: ICE_BREAKER_V7 ACTIVE
+                </div>`,
+            matrix: () => `
+                <div class="text-cyber-green font-mono text-[11px] leading-tight animate-pulse">
+                    01000001 01010010 01010100 01000101 01001101 <br>
+                    01001011 01010010 01000001 01011001 01001110 01001111 01010110 <br>
+                    [ MATRIX STREAM INITIALIZED // NET CONNECTION SECURE ]
+                </div>`,
+            clear: () => {
+                terminalBody.innerHTML = '';
+                return '';
+            }
+        };
+
+        terminalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rawVal = terminalInput.value.trim();
+            if (!rawVal) return;
+
+            playTerminalTick();
+
+            const cmd = rawVal.toLowerCase();
+
+            // Print user command
+            const userLine = document.createElement('div');
+            userLine.className = 'text-cyber-cyan mt-2';
+            userLine.innerHTML = `guest@nightcity:~$ <span class="text-white">${escapeHtml(rawVal)}</span>`;
+            terminalBody.appendChild(userLine);
+
+            // Execute command
+            if (COMMANDS[cmd]) {
+                const response = COMMANDS[cmd]();
+                if (response) {
+                    const respLine = document.createElement('div');
+                    respLine.innerHTML = response;
+                    terminalBody.appendChild(respLine);
+                }
+            } else {
+                const errLine = document.createElement('div');
+                errLine.className = 'text-red-400';
+                errLine.innerHTML = `ERR: Команда '${escapeHtml(rawVal)}' не распознана. Введите <span class="text-cyber-yellow">help</span> для справки.`;
+                terminalBody.appendChild(errLine);
+            }
+
+            terminalInput.value = '';
+            terminalBody.scrollTop = terminalBody.scrollHeight;
+        });
+
+        // Helper to escape HTML tags in input
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Animate skill bars on view
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.skill-bar').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.transition = 'width 1.2s cubic-bezier(0.1, 0.9, 0.2, 1)';
+                    bar.style.width = width;
+                }, 300);
+            });
+        });
+    </script>
+</body>
+</html>
